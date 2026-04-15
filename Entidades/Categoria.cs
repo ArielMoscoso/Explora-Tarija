@@ -6,7 +6,6 @@ namespace ExploraTarija.Entidades
     {
         public int IdCategoria { get; set; }
         public string? NombreCategoria { get; set; }
-    // Relación: Una categoría tiene muchos productos en el catálogo
         public List<Catalogo> ItemsCatalogo { get; set; }
     }
 }

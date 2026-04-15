@@ -11,7 +11,6 @@ namespace ExploraTarija.Entidades
         public required decimal Precio { get; set; }
         public required DateTime FechaPublicacion { get; set; }
 
-        // Claves Foráneas y Objetos de Relación
         public int IdEmpresa { get; set; }
         public Empresa EmpresaPropietaria { get; set; }
 

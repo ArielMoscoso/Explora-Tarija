@@ -4,7 +4,7 @@ namespace ExploraTarija.Entidades
 {
     public class Usuario
     {
-        public int IdUsuarios { get; set; }
+        public required int IdUsuarios { get; set; }
         public string? Nombre { get; set; }
         public string? Apellido { get; set; }
         public int CI { get; set; }
