@@ -1,0 +1,6 @@
+@ExploraTarija_HostAddress = http://localhost:5294
+
+GET {{ExploraTarija_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
