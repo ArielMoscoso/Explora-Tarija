@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ExploraTarija")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dbb99fc08137d21d97503416648a5bec84313cda")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+855ed387f8561c6ffadfb0034809b43b014a1f72")]
 [assembly: System.Reflection.AssemblyProductAttribute("ExploraTarija")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ExploraTarija")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

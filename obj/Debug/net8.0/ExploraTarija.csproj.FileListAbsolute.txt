@@ -136,3 +136,4 @@ C:\Programacion Web 1\ExploraTarija\obj\Debug\net8.0\refint\ExploraTarija.dll
 C:\Programacion Web 1\ExploraTarija\obj\Debug\net8.0\ExploraTarija.pdb
 C:\Programacion Web 1\ExploraTarija\obj\Debug\net8.0\ExploraTarija.genruntimeconfig.cache
 C:\Programacion Web 1\ExploraTarija\obj\Debug\net8.0\ref\ExploraTarija.dll
+C:\Programacion Web 1\ExploraTarija\obj\Debug\net8.0\ExploraTarija.sourcelink.json
