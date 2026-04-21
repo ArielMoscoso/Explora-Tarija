@@ -29,6 +29,7 @@ namespace ExploraTarija.Controllers
        [HttpPost]
         public async Task<ActionResult<AgregarUsuarioOutput>> CreateUsuario([FromBody] AgregarUsuarioInput input)
         {
+
             // Mapeo de Entrada a la Entidad de BD
             var nuevoUsuario = new Usuario
             {

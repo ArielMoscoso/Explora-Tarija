@@ -7,7 +7,7 @@ namespace ExploraTarija.Entidades
         public int IdReservas { get; set; }
         public DateTime FechaReserva { get; set; }
         
-        public EstadoReservaEnum? Estado { get; set; }
+        public EstadoReserva? Estado { get; set; }
 
         public int IdUsuario { get; set; }
         public Usuario? UsuarioReserva { get; set; }
