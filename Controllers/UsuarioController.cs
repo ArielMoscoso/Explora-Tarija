@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ExploraTarija.DTO.Usuario.AgregarUsuario;
 using ExploraTarija.Data;
 using ExploraTarija.Entidades;
 
@@ -25,13 +26,35 @@ namespace ExploraTarija.Controllers
         }
         // Crea usuario
 
-        [HttpPost]
-        public async Task<ActionResult<Usuario>> CreateUsuario(Usuario usuario)
+       [HttpPost]
+        public async Task<ActionResult<AgregarUsuarioOutput>> CreateUsuario([FromBody] AgregarUsuarioInput input)
         {
-            _contexto.Usuarios.Add(usuario);
+            // Mapeo de Entrada a la Entidad de BD
+            var nuevoUsuario = new Usuario
+            {
+                Nombre = input.nombre,
+                Apellido = input.apellido,
+                CI = input.CI,
+                Celular = input.Celular
+            };
+
+            // Guarda en la base de datos
+            _contexto.Usuarios.Add(nuevoUsuario);
             await _contexto.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetUsuario), new { id = usuario.IdUsuarios }, usuario);
+
+            // Salida Output
+            var salida = new AgregarUsuarioOutput
+            {
+                IdUsuario = nuevoUsuario.IdUsuarios,
+                Nombre = nuevoUsuario.Nombre,
+                Apellido = nuevoUsuario.Apellido,
+                CI = nuevoUsuario.CI,
+                Celular = nuevoUsuario.Celular
+            };
+
+            return CreatedAtAction(nameof(GetUsuario), new { id = salida.IdUsuario }, salida);
         }
+    
         // Actualiza usuario
 
         [HttpPut("{id}")]

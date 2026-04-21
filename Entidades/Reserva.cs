@@ -6,14 +6,16 @@ namespace ExploraTarija.Entidades
     {
         public int IdReservas { get; set; }
         public DateTime FechaReserva { get; set; }
+        
+        public EstadoReservaEnum? Estado { get; set; }
 
         public int IdUsuario { get; set; }
-        public Usuario UsuarioReserva { get; set; }
+        public Usuario? UsuarioReserva { get; set; }
 
         public int IdCatalogo { get; set; }
-        public Catalogo ProductoReservado { get; set; }
+        public Catalogo? ProductoReservado { get; set; }
 
         public int IdPago { get; set; }
-        public Pago DetallePago { get; set; }
+        public Pago? DetallePago { get; set; }
     }
 }

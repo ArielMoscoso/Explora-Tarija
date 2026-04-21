@@ -4,8 +4,14 @@ namespace ExploraTarija.Entidades
 {
     public class Pago
     {
-        public required int IdPago { get; set; }
-        public required string MetodoPago { get; set; }
+        public int IdPago { get; set; }
+        public string? MetodoPago { get; set; }
+        public decimal Monto { get; set; }
         public DateTime FechaPago { get; set; }
+
+        public EstadoPago? Estado { get; set; }
+
+        public int IdReserva { get; set; }
+        public Reserva? Reserva { get; set; }
     }
 }

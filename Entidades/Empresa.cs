@@ -6,10 +6,10 @@ namespace ExploraTarija.Entidades
     {
         public int IdEmpresa { get; set; }
         public string? NombreEmpresa { get; set; }
-        public string? TelefonoEmpresa { get; set; }
+        public int TelefonoEmpresa { get; set; }
         public string? CorreoEmpresa { get; set; }
         public string? DireccionEmpresa { get; set; }
 
-        public List<Catalogo> Productos { get; set; }
+        public List<Catalogo>? Productos { get; set; }
     }
 }
