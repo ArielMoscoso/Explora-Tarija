@@ -1,10 +1,12 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace ExploraTarija.DTO.Usuario.AgregarUsuario;
+namespace ExploraTarija.DTO.Usuario.ActualizarUsuario;
 
-public class AgregarUsuarioInput
+public class ActualizarUsuarioInput
 {
+    // El ID no suele validarse con DataAnnotations aquí porque viene de la URL
+    
     [Required(ErrorMessage = "El nombre es obligatorio.")]
     [StringLength(50, MinimumLength = 2, ErrorMessage = "El nombre debe tener entre 2 y 50 caracteres.")]
     public required string nombre { get; set; }

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ExploraTarija.DTO.Usuario.AgregarUsuario;
+using ExploraTarija.DTO.Usuario.ActualizarUsuario;
+using ExploraTarija.DTO.Usuario.EliminarUsuario;
 using ExploraTarija.Data;
 using ExploraTarija.Entidades;
 
@@ -8,7 +10,7 @@ namespace ExploraTarija.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsuariosController : ControllerBase
+    public class UsuariosController : BaseApiController
     {
         private readonly AppDbContext _contexto;
 
@@ -29,6 +31,12 @@ namespace ExploraTarija.Controllers
        [HttpPost]
         public async Task<ActionResult<AgregarUsuarioOutput>> CreateUsuario([FromBody] AgregarUsuarioInput input)
         {
+            var nombreNormalizado = NormalizarTexto(input.nombre);
+            var apellidoNormalizado = NormalizarTexto(input.apellido);
+
+            var existeUsuario = await _contexto.Usuarios.AnyAsync(x => x.CI == input.CI);
+            if (existeUsuario)
+                return Conflict("Ya existe un usuario registrado con este CI.");
 
             // Mapeo de Entrada a la Entidad de BD
             var nuevoUsuario = new Usuario
@@ -59,23 +67,72 @@ namespace ExploraTarija.Controllers
         // Actualiza usuario
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUsuario(int id, Usuario usuario)
+        public async Task<IActionResult> UpdateUsuario(int id, [FromBody] ActualizarUsuarioInput input )
         {
-            if (id != usuario.IdUsuarios) return BadRequest();
-            _contexto.Entry(usuario).State = EntityState.Modified;
-            await _contexto.SaveChangesAsync();
-            return NoContent();
-        }
-        // Borrar usuario
+            if (id <= 0)
+                return BadRequest("El ID del usuario es inválido.");
 
+            var existing = await _contexto.Usuarios.FindAsync(id);
+            
+            if (existing == null)
+                return NotFound();
+
+            
+            var ciEnUso = await _contexto.Usuarios.AnyAsync(x => x.IdUsuarios != id && x.CI == input.CI);;
+            if (ciEnUso)
+                return Conflict("El CI ingresado ya pertenece a otro usuario.");
+
+            
+            existing.Nombre = NormalizarTexto(input.nombre);
+            existing.Apellido = NormalizarTexto(input.apellido);
+            existing.CI = input.CI;
+            existing.Celular = input.Celular;
+
+            await _contexto.SaveChangesAsync();
+
+            
+            var salida = new ActualizarUsuarioOutput
+            {
+                IdUsuario = existing.IdUsuarios,
+                Nombre = existing.Nombre, 
+                Apellido = existing.Apellido,
+                CI = existing.CI,
+                Celular = existing.Celular,
+                FechaActualizacion = DateTime.Now
+            };
+
+            return Ok(salida);
+        }
+        
+        // Elimina usuario
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUsuario(int id)
+        public async Task<ActionResult<EliminarUsuarioOutput>> DeleteUsuario(int id)
         {
+            if (id <= 0)
+                return BadRequest("El ID del usuario es inválido.");
+
             var usuario = await _contexto.Usuarios.FindAsync(id);
             if (usuario == null) return NotFound();
+
+           
+            var salida = new EliminarUsuarioOutput
+            {
+                IdUsuario = usuario.IdUsuarios,
+                Nombre = usuario.Nombre,
+                Mensaje = "Usuario eliminado exitosamente."
+            };
+
             _contexto.Usuarios.Remove(usuario);
             await _contexto.SaveChangesAsync();
-            return NoContent();
+
+            return Ok(salida);
+        }
+        private static string? NormalizarTexto(string? texto)
+        {
+            if (string.IsNullOrWhiteSpace(texto))
+                return null;
+
+            return texto.Trim().ToUpperInvariant();
         }
     }
 }
