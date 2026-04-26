@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ExploraTarija.Migrations
 {
     /// <inheritdoc />
-    public partial class Version1 : Migration
+    public partial class InitialV1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,27 +31,13 @@ namespace ExploraTarija.Migrations
                     IdEmpresa = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     NombreEmpresa = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    TelefonoEmpresa = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    TelefonoEmpresa = table.Column<int>(type: "int", maxLength: 20, nullable: false),
                     CorreoEmpresa = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     DireccionEmpresa = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Empresa", x => x.IdEmpresa);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Pago",
-                columns: table => new
-                {
-                    IdPago = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    MetodoPago = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    FechaPago = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Pago", x => x.IdPago);
                 });
 
             migrationBuilder.CreateTable(
@@ -103,16 +89,15 @@ namespace ExploraTarija.Migrations
                 name: "Reservas",
                 columns: table => new
                 {
-                    IdReservas = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IdReserva = table.Column<int>(type: "int", nullable: false),
                     FechaReserva = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Estado = table.Column<int>(type: "int", nullable: true),
                     IdUsuario = table.Column<int>(type: "int", nullable: false),
-                    IdCatalogo = table.Column<int>(type: "int", nullable: false),
-                    IdPago = table.Column<int>(type: "int", nullable: false)
+                    IdCatalogo = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Reservas", x => x.IdReservas);
+                    table.PrimaryKey("PK_Reservas", x => x.IdReserva);
                     table.ForeignKey(
                         name: "FK_Reservas_Catalogo_IdCatalogo",
                         column: x => x.IdCatalogo,
@@ -120,16 +105,33 @@ namespace ExploraTarija.Migrations
                         principalColumn: "IdCatalogo",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Reservas_Pago_IdPago",
-                        column: x => x.IdPago,
-                        principalTable: "Pago",
-                        principalColumn: "IdPago",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Reservas_Usuarios_IdUsuario",
-                        column: x => x.IdUsuario,
+                        name: "FK_Reservas_Usuarios_IdReserva",
+                        column: x => x.IdReserva,
                         principalTable: "Usuarios",
                         principalColumn: "IdUsuarios",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Pagos",
+                columns: table => new
+                {
+                    IdPago = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MetodoPago = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Monto = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    FechaPago = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Estado = table.Column<int>(type: "int", nullable: true),
+                    IdReserva = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Pagos", x => x.IdPago);
+                    table.ForeignKey(
+                        name: "FK_Pagos_Reservas_IdReserva",
+                        column: x => x.IdReserva,
+                        principalTable: "Reservas",
+                        principalColumn: "IdReserva",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -144,19 +146,14 @@ namespace ExploraTarija.Migrations
                 column: "IdEmpresa");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Pagos_IdReserva",
+                table: "Pagos",
+                column: "IdReserva");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Reservas_IdCatalogo",
                 table: "Reservas",
                 column: "IdCatalogo");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Reservas_IdPago",
-                table: "Reservas",
-                column: "IdPago");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Reservas_IdUsuario",
-                table: "Reservas",
-                column: "IdUsuario");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Usuarios_CI",
@@ -169,13 +166,13 @@ namespace ExploraTarija.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Pagos");
+
+            migrationBuilder.DropTable(
                 name: "Reservas");
 
             migrationBuilder.DropTable(
                 name: "Catalogo");
-
-            migrationBuilder.DropTable(
-                name: "Pago");
 
             migrationBuilder.DropTable(
                 name: "Usuarios");

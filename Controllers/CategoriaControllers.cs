@@ -1,0 +1,98 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ExploraTarija.Data;
+using ExploraTarija.DTO.Categoria.AgregarCategoria;
+using ExploraTarija.DTO.Categoria.ActualizarCategoria ;
+using ExploraTarija.DTO.Categoria.EliminarCategoria;
+using ExploraTarija.Entidades;
+
+namespace ExploraTarija.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class CategoriasController : BaseApiController
+    {
+        private readonly AppDbContext _contexto;
+
+        public CategoriasController(AppDbContext contexto) => _contexto = contexto;
+
+        // 1. LEER TODAS (GET)
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Categoria>>> GetCategorias() => 
+            Ok(await _contexto.Categorias.ToListAsync());
+
+        // 2. LEER UNA POR ID (GET)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Categoria>> GetCategoria(int id)
+        {
+            var categoria = await _contexto.Categorias.FindAsync(id);
+            return categoria == null ? NotFound() : Ok(categoria);
+        }
+
+        // 3. AÑADIR NUEVA (POST)
+        [HttpPost]
+
+        public async Task<ActionResult<AgregarCategoriaOutput>> CreateCategoria([FromBody] AgregarCategoriaInput categoriaInput)
+        {
+            var nuevaCategoria = new Categoria
+            {
+                NombreCategoria = categoriaInput.NombreCategoria
+            };
+            
+            _contexto.Categorias.Add(nuevaCategoria);
+            await _contexto.SaveChangesAsync();
+
+            var salida = new AgregarCategoriaOutput
+            {
+                IdCategoria = nuevaCategoria.IdCategoria,
+                NombreCategoria = nuevaCategoria.NombreCategoria
+            };
+
+            
+            // Retorna la ruta del nuevo objeto creado
+            return CreatedAtAction(nameof(GetCategoria), new { id = salida.IdCategoria }, salida);
+        }
+
+        // 4. ACTUALIZAR (PUT)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCategoria(int id, [FromBody] ActualizarCategoriaInput categoriaInput)
+        {
+
+            
+            var categoriaExistente = await _contexto.Categorias.FindAsync(id);
+            //if (categoriaExistente == null) return NotFound("La categoría no existe.");
+
+            categoriaExistente.IdCategoria = categoriaInput.IdCategoria;
+            categoriaExistente.NombreCategoria = categoriaInput.NombreCategoria;
+
+            await _contexto.SaveChangesAsync();
+
+            var salida = new Categoria
+            {
+                IdCategoria = categoriaExistente.IdCategoria,
+                NombreCategoria = categoriaExistente.NombreCategoria
+            };
+
+            return Ok(salida); // 204: Éxito sin contenido de respuesta
+        }
+
+        // 5. BORRAR (DELETE)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCategoria(int id)
+        {
+
+            if (id <= 0) return BadRequest("El ID de la categoría es inválido.");
+            var categoria = await _contexto.Categorias.FindAsync(id);
+            if (categoria == null) return NotFound("No se encontró la categoría con el ID especificado.");
+
+            var salida = new EliminarCategoriaOutput
+            {
+                IdCategoria = categoria.IdCategoria
+            };
+
+            _contexto.Categorias.Remove(categoria);
+            await _contexto.SaveChangesAsync();
+            return NoContent();
+        }
+    }
+}

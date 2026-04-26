@@ -4,7 +4,7 @@ namespace ExploraTarija.Entidades
 {
     public class Reserva
     {
-        public int IdReservas { get; set; }
+        public int IdReserva { get; set; }
         public DateTime FechaReserva { get; set; }
         
         public EstadoReserva? Estado { get; set; }
@@ -15,7 +15,6 @@ namespace ExploraTarija.Entidades
         public int IdCatalogo { get; set; }
         public Catalogo? ProductoReservado { get; set; }
 
-        public int IdPago { get; set; }
-        public Pago? DetallePago { get; set; }
+        public List<Pago>? Pagos { get; set; }
     }
-}
+} 

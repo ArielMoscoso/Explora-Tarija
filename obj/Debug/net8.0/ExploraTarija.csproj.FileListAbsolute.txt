@@ -122,6 +122,7 @@ C:\Programacion Web 1\ExploraTarija\obj\Debug\net8.0\ExploraTarija.AssemblyInfo.
 C:\Programacion Web 1\ExploraTarija\obj\Debug\net8.0\ExploraTarija.csproj.CoreCompileInputs.cache
 C:\Programacion Web 1\ExploraTarija\obj\Debug\net8.0\ExploraTarija.MvcApplicationPartsAssemblyInfo.cs
 C:\Programacion Web 1\ExploraTarija\obj\Debug\net8.0\ExploraTarija.MvcApplicationPartsAssemblyInfo.cache
+C:\Programacion Web 1\ExploraTarija\obj\Debug\net8.0\ExploraTarija.sourcelink.json
 C:\Programacion Web 1\ExploraTarija\obj\Debug\net8.0\rjimswa.dswa.cache.json
 C:\Programacion Web 1\ExploraTarija\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
 C:\Programacion Web 1\ExploraTarija\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
@@ -136,4 +137,3 @@ C:\Programacion Web 1\ExploraTarija\obj\Debug\net8.0\refint\ExploraTarija.dll
 C:\Programacion Web 1\ExploraTarija\obj\Debug\net8.0\ExploraTarija.pdb
 C:\Programacion Web 1\ExploraTarija\obj\Debug\net8.0\ExploraTarija.genruntimeconfig.cache
 C:\Programacion Web 1\ExploraTarija\obj\Debug\net8.0\ref\ExploraTarija.dll
-C:\Programacion Web 1\ExploraTarija\obj\Debug\net8.0\ExploraTarija.sourcelink.json

@@ -29,22 +29,22 @@ namespace ExploraTarija.Controllers
         // Crea usuario
 
        [HttpPost]
-        public async Task<ActionResult<AgregarUsuarioOutput>> CreateUsuario([FromBody] AgregarUsuarioInput input)
+        public async Task<ActionResult<AgregarUsuarioOutput>> CreateUsuario([FromBody] AgregarUsuarioInput usuarioInput)
         {
-            var nombreNormalizado = NormalizarTexto(input.nombre);
-            var apellidoNormalizado = NormalizarTexto(input.apellido);
+            var nombreNormalizado = NormalizarTexto(usuarioInput.nombre);
+            var apellidoNormalizado = NormalizarTexto(usuarioInput.apellido);
 
-            var existeUsuario = await _contexto.Usuarios.AnyAsync(x => x.CI == input.CI);
+            var existeUsuario = await _contexto.Usuarios.AnyAsync(x => x.CI == usuarioInput.CI);
             if (existeUsuario)
                 return Conflict("Ya existe un usuario registrado con este CI.");
 
             // Mapeo de Entrada a la Entidad de BD
             var nuevoUsuario = new Usuario
             {
-                Nombre = input.nombre,
-                Apellido = input.apellido,
-                CI = input.CI,
-                Celular = input.Celular
+                Nombre = usuarioInput.nombre,
+                Apellido = usuarioInput.apellido,
+                CI = usuarioInput.CI,
+                Celular = usuarioInput.Celular
             };
 
             // Guarda en la base de datos
@@ -53,7 +53,7 @@ namespace ExploraTarija.Controllers
 
             // Salida Output
             var salida = new AgregarUsuarioOutput
-            {
+            { 
                 IdUsuario = nuevoUsuario.IdUsuarios,
                 Nombre = nuevoUsuario.Nombre,
                 Apellido = nuevoUsuario.Apellido,
@@ -98,7 +98,7 @@ namespace ExploraTarija.Controllers
                 Apellido = existing.Apellido,
                 CI = existing.CI,
                 Celular = existing.Celular,
-                FechaActualizacion = DateTime.Now
+                FechaModificacionUsuario = DateTime.Now
             };
 
             return Ok(salida);
@@ -127,10 +127,10 @@ namespace ExploraTarija.Controllers
 
             return Ok(salida);
         }
-        private static string? NormalizarTexto(string? texto)
+        private static string?  NormalizarTexto(string? texto)
         {
             if (string.IsNullOrWhiteSpace(texto))
-                return null;
+                return null; 
 
             return texto.Trim().ToUpperInvariant();
         }

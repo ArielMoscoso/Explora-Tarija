@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace ExploraTarija.DTO.Usuario.ActualizarUsuario;
@@ -15,9 +16,11 @@ public class ActualizarUsuarioInput
     [StringLength(50, MinimumLength = 2, ErrorMessage = "El apellido debe tener entre 2 y 50 caracteres.")]
     public required string apellido { get; set; }
 
+    [DefaultValue(0)]
     [Range(1, int.MaxValue, ErrorMessage = "El CI debe ser mayor a 0.")]
     public int CI { get; set; }
 
+    [DefaultValue(0)]
     [Range(60000000, 79999999, ErrorMessage = "Ingrese un número de celular válido de Bolivia.")]
     public int Celular { get; set; }
 }

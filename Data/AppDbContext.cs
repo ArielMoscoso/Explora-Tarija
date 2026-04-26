@@ -50,10 +50,16 @@ public class AppDbContext : DbContext
 
         
         modelBuilder.Entity<Pago>(entity => {
-            entity.ToTable("Pago");
+            entity.ToTable("Pagos");
             entity.HasKey(e => e.IdPago);
             entity.Property(e => e.MetodoPago).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Monto).IsRequired().HasColumnType("decimal(10,2)");
             entity.Property(e => e.FechaPago).IsRequired();
+
+            entity.HasOne(d => d.Reserva)
+                  .WithMany(p => p.Pagos)
+                  .HasForeignKey(d => d.IdReserva)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         
@@ -80,23 +86,19 @@ public class AppDbContext : DbContext
         
         modelBuilder.Entity<Reserva>(entity => {
             entity.ToTable("Reservas");
-            entity.HasKey(e => e.IdReservas);
+            entity.HasKey(e => e.IdReserva);
             entity.Property(e => e.FechaReserva).IsRequired();
 
             
             entity.HasOne(d => d.UsuarioReserva)
                   .WithMany(p => p.MisReservas)
-                  .HasForeignKey(d => d.IdUsuario);
+                  .HasForeignKey(d => d.IdReserva);
 
            
             entity.HasOne(d => d.ProductoReservado)
                   .WithMany() 
                   .HasForeignKey(d => d.IdCatalogo);
 
-            
-            entity.HasOne(d => d.DetallePago)
-                  .WithMany()
-                  .HasForeignKey(d => d.IdPago);
         });
     }
 }

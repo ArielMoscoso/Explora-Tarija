@@ -128,25 +128,19 @@ namespace ExploraTarija.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<decimal>("Monto")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("ReservaIdReservas")
-                        .HasColumnType("int");
+                        .HasColumnType("decimal(10,2)");
 
                     b.HasKey("IdPago");
 
-                    b.HasIndex("ReservaIdReservas");
+                    b.HasIndex("IdReserva");
 
-                    b.ToTable("Pago", (string)null);
+                    b.ToTable("Pagos", (string)null);
                 });
 
             modelBuilder.Entity("ExploraTarija.Entidades.Reserva", b =>
                 {
-                    b.Property<int>("IdReservas")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("IdReserva")
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdReservas"));
 
                     b.Property<int?>("Estado")
                         .HasColumnType("int");
@@ -157,19 +151,12 @@ namespace ExploraTarija.Migrations
                     b.Property<int>("IdCatalogo")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdPago")
-                        .HasColumnType("int");
-
                     b.Property<int>("IdUsuario")
                         .HasColumnType("int");
 
-                    b.HasKey("IdReservas");
+                    b.HasKey("IdReserva");
 
                     b.HasIndex("IdCatalogo");
-
-                    b.HasIndex("IdPago");
-
-                    b.HasIndex("IdUsuario");
 
                     b.ToTable("Reservas", (string)null);
                 });
@@ -230,8 +217,10 @@ namespace ExploraTarija.Migrations
             modelBuilder.Entity("ExploraTarija.Entidades.Pago", b =>
                 {
                     b.HasOne("ExploraTarija.Entidades.Reserva", "Reserva")
-                        .WithMany()
-                        .HasForeignKey("ReservaIdReservas");
+                        .WithMany("Pagos")
+                        .HasForeignKey("IdReserva")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Reserva");
                 });
@@ -244,19 +233,11 @@ namespace ExploraTarija.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ExploraTarija.Entidades.Pago", "DetallePago")
-                        .WithMany()
-                        .HasForeignKey("IdPago")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ExploraTarija.Entidades.Usuario", "UsuarioReserva")
                         .WithMany("MisReservas")
-                        .HasForeignKey("IdUsuario")
+                        .HasForeignKey("IdReserva")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("DetallePago");
 
                     b.Navigation("ProductoReservado");
 
@@ -271,6 +252,11 @@ namespace ExploraTarija.Migrations
             modelBuilder.Entity("ExploraTarija.Entidades.Empresa", b =>
                 {
                     b.Navigation("Productos");
+                });
+
+            modelBuilder.Entity("ExploraTarija.Entidades.Reserva", b =>
+                {
+                    b.Navigation("Pagos");
                 });
 
             modelBuilder.Entity("ExploraTarija.Entidades.Usuario", b =>
