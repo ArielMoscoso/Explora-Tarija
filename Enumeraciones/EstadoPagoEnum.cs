@@ -9,3 +9,4 @@ namespace ExploraTarija.Entidades
             Cancelado
         }
 }
+ 

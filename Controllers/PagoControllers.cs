@@ -62,8 +62,6 @@ namespace ExploraTarija.Controllers
                 
             };
 
-
-
             return Ok(salida);
         }
         private static string? AdecuarTexto(string? texto)
