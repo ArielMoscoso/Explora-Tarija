@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ExploraTarija.Data;
 using ExploraTarija.DTO.Categoria.AgregarCategoria;
 using ExploraTarija.DTO.Categoria.ActualizarCategoria ;
+using ExploraTarija.DTO.Categoria.FiltrarCategoria;
 using ExploraTarija.DTO.Categoria.EliminarCategoria;
 using ExploraTarija.Entidades;
 
@@ -21,12 +22,23 @@ namespace ExploraTarija.Controllers
         public async Task<ActionResult<IEnumerable<Categoria>>> GetCategorias() => 
             Ok(await _contexto.Categorias.ToListAsync());
 
-        // 2. LEER UNA POR ID (GET)
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Categoria>> GetCategoria(int id)
+        // 2. LEER UNA POR ID (GET) run
+        [HttpGet("FiltrarCategoria")]
+        public async Task<IActionResult> GetCategoria(
+            [FromQuery] string? nombreCategoria)
+
         {
-            var categoria = await _contexto.Categorias.FindAsync(id);
-            return categoria == null ? NotFound() : Ok(categoria);
+            var query = _contexto.Categorias.AsQueryable();
+            if (!string.IsNullOrEmpty(nombreCategoria))
+            {
+                query = query.Where(c => c.NombreCategoria.Contains(nombreCategoria));
+            }
+            var categorias = await query.Select(c => new FiltrarCategoriaOutput
+            {
+                IdCategoria = c.IdCategoria,
+                NombreCategoria = c.NombreCategoria
+            }).ToListAsync();
+            return Ok(categorias);
         }
 
         // 3. AÑADIR NUEVA (POST)
@@ -36,7 +48,7 @@ namespace ExploraTarija.Controllers
         {
             var nuevaCategoria = new Categoria
             {
-                NombreCategoria = categoriaInput.NombreCategoria
+                NombreCategoria = NormalizarTexto(categoriaInput.NombreCategoria)   
             };
             
             _contexto.Categorias.Add(nuevaCategoria);
@@ -60,7 +72,7 @@ namespace ExploraTarija.Controllers
 
             
             var categoriaExistente = await _contexto.Categorias.FindAsync(id);
-            //if (categoriaExistente == null) return NotFound("La categoría no existe.");
+            if (categoriaExistente == null) return NotFound("La categoría no existe.");
 
             categoriaExistente.IdCategoria = categoriaInput.IdCategoria;
             categoriaExistente.NombreCategoria = categoriaInput.NombreCategoria;
@@ -76,23 +88,10 @@ namespace ExploraTarija.Controllers
             return Ok(salida); // 204: Éxito sin contenido de respuesta
         }
 
-        // 5. BORRAR (DELETE)
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategoria(int id)
+        private static string NormalizarTexto(string texto)
         {
-
-            if (id <= 0) return BadRequest("El ID de la categoría es inválido.");
-            var categoria = await _contexto.Categorias.FindAsync(id);
-            if (categoria == null) return NotFound("No se encontró la categoría con el ID especificado.");
-
-            var salida = new EliminarCategoriaOutput
-            {
-                IdCategoria = categoria.IdCategoria
-            };
-
-            _contexto.Categorias.Remove(categoria);
-            await _contexto.SaveChangesAsync();
-            return NoContent();
+            return texto.Trim().ToUpperInvariant();
         }
+
     }
 }

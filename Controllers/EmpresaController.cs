@@ -5,6 +5,7 @@ using ExploraTarija.Entidades;
 using ExploraTarija.DTO.Empresa.ActualizarEmpresa;
 using ExploraTarija.DTO.Empresa.AgregarEmpresa;
 using ExploraTarija.DTO.Empresa.EliminarEmpresa;
+using ExploraTarija.DTO.Empresa.FiltrarEmpresa;
 
 namespace ExploraTarija.Controllers
 {
@@ -27,12 +28,23 @@ namespace ExploraTarija.Controllers
         }
 
         
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Empresa>> GetEmpresa(int id)
+        [HttpGet("FiltrarEmpresa")]
+        public async Task<IActionResult> GetEmpresa(
+            [FromQuery] string? nombreEmpresa)
         {
-            var empresa = await _contexto.Empresas.FindAsync(id);
-            if (empresa == null) return NotFound("La empresa no existe.");
-            return Ok(empresa);
+            var query = _contexto.Empresas.AsQueryable();
+            if (!string.IsNullOrEmpty(nombreEmpresa))            {
+                query = query.Where(e => e.NombreEmpresa.Contains(nombreEmpresa));
+            }
+            var empresas = await query.Select(e => new FiltrarEmpresaOutput
+            {
+                IdEmpresa = e.IdEmpresa,
+                NombreEmpresa = e.NombreEmpresa,
+                TelefonoEmpresa = e.TelefonoEmpresa,
+                CorreoEmpresa = e.CorreoEmpresa,
+                DireccionEmpresa = e.DireccionEmpresa
+            }).ToListAsync();
+            return Ok(empresas);
         }
 
         // Crea empresa
@@ -96,24 +108,6 @@ namespace ExploraTarija.Controllers
             return NoContent(); 
         }
 
-        // Borrar empresa
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmpresa(int id)
-        {
-            if (id <= 0)
-                return BadRequest("El ID de la empresa es invalido.");
-            
-            var empresa = await _contexto.Empresas.FindAsync(id);
-            if (empresa == null) return NotFound("No se encontró la empresa para eliminar.");
-
-            var salida = new EliminarEmpresaOutput
-            {
-                IdEmpresa = empresa.IdEmpresa
-            };
-
-            _contexto.Empresas.Remove(empresa);
-            await _contexto.SaveChangesAsync();
-            return NoContent();
-        }
+        
     }
 }

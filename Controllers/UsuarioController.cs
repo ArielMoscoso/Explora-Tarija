@@ -5,6 +5,7 @@ using ExploraTarija.DTO.Usuario.ActualizarUsuario;
 using ExploraTarija.DTO.Usuario.EliminarUsuario;
 using ExploraTarija.Data;
 using ExploraTarija.Entidades;
+using ExploraTarija.DTO.Usuario.FiltrarUsuario;
 
 namespace ExploraTarija.Controllers
 {
@@ -20,11 +21,25 @@ namespace ExploraTarija.Controllers
         public async Task<ActionResult<IEnumerable<Usuario>>> GetUsuarios() => 
             Ok(await _contexto.Usuarios.ToListAsync());
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Usuario>> GetUsuario(int id)
+        [HttpGet("FiltrarUsuario")]
+        public async Task<IActionResult> GetUsuario(
+            [FromQuery] string? nombreUsuario)
         {
-            var usuario = await _contexto.Usuarios.FindAsync(id);
-            return usuario == null ? NotFound() : Ok(usuario);
+            var query = _contexto.Usuarios.AsQueryable();
+            if (!string.IsNullOrEmpty(nombreUsuario))
+            {
+                query = query.Where(u => u.Nombre.Contains(nombreUsuario));
+            }
+            
+            var usuarios = await query.Select(u => new FiltrarUsuarioOutput
+            {
+                IdUsuario = u.IdUsuarios,
+                Nombre = u.Nombre,
+                Apellido = u.Apellido,
+                CI = u.CI,
+                Celular = u.Celular
+            }).ToListAsync();
+            return Ok(usuarios);
         }
         // Crea usuario
 
@@ -67,7 +82,7 @@ namespace ExploraTarija.Controllers
         // Actualiza usuario
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUsuario(int id, [FromBody] ActualizarUsuarioInput input )
+        public async Task<IActionResult> UpdateUsuario(int id, [FromBody] ActualizarUsuarioInput usuarioInput )
         {
             if (id <= 0)
                 return BadRequest("El ID del usuario es inválido.");
@@ -78,15 +93,15 @@ namespace ExploraTarija.Controllers
                 return NotFound();
 
             
-            var ciEnUso = await _contexto.Usuarios.AnyAsync(x => x.IdUsuarios != id && x.CI == input.CI);;
+            var ciEnUso = await _contexto.Usuarios.AnyAsync(x => x.IdUsuarios != id && x.CI == usuarioInput.CI);;
             if (ciEnUso)
                 return Conflict("El CI ingresado ya pertenece a otro usuario.");
 
             
-            existing.Nombre = NormalizarTexto(input.nombre);
-            existing.Apellido = NormalizarTexto(input.apellido);
-            existing.CI = input.CI;
-            existing.Celular = input.Celular;
+            existing.Nombre = NormalizarTexto(usuarioInput.nombre);
+            existing.Apellido = NormalizarTexto(usuarioInput.apellido);
+            existing.CI = usuarioInput.CI;
+            existing.Celular = usuarioInput.Celular;
 
             await _contexto.SaveChangesAsync();
 
@@ -104,34 +119,8 @@ namespace ExploraTarija.Controllers
             return Ok(salida);
         }
         
-        // Elimina usuario
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<EliminarUsuarioOutput>> DeleteUsuario(int id)
+        private static string  NormalizarTexto(string texto)
         {
-            if (id <= 0)
-                return BadRequest("El ID del usuario es inválido.");
-
-            var usuario = await _contexto.Usuarios.FindAsync(id);
-            if (usuario == null) return NotFound();
-
-           
-            var salida = new EliminarUsuarioOutput
-            {
-                IdUsuario = usuario.IdUsuarios,
-                Nombre = usuario.Nombre,
-                Mensaje = "Usuario eliminado exitosamente."
-            };
-
-            _contexto.Usuarios.Remove(usuario);
-            await _contexto.SaveChangesAsync();
-
-            return Ok(salida);
-        }
-        private static string?  NormalizarTexto(string? texto)
-        {
-            if (string.IsNullOrWhiteSpace(texto))
-                return null; 
-
             return texto.Trim().ToUpperInvariant();
         }
     }

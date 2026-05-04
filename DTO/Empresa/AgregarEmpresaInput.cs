@@ -14,5 +14,7 @@ public class AgregarEmpresaInput
     public required int TelefonoEmpresa { get; set; }
     [EmailAddress(ErrorMessage = "Correo inválido.")]
     public string? CorreoEmpresa { get; set; }
+    [Required(ErrorMessage = "La dirección es obligatoria.")]
+    [StringLength(80, MinimumLength = 3, ErrorMessage = "La dirección debe tener entre 3 y 80 caracteres:")]
     public string? DireccionEmpresa { get; set; }
 }

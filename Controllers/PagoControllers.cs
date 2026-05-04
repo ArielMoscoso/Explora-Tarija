@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ExploraTarija.Data;
 using ExploraTarija.DTO.Pago.AgregarPago;
+using ExploraTarija.DTO.Pago.FiltrarPago;
 using ExploraTarija.Entidades;
 
 namespace ExploraTarija.Controllers
@@ -17,18 +18,28 @@ namespace ExploraTarija.Controllers
             _contexto = contexto;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Pago>>> GetPagos() => 
+            Ok(await _contexto.Pagos.ToListAsync());
+
         // Get
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Pago>> GetPago(int id)
+        [HttpGet("FiltrarMetodoPago")]
+        public async Task<IActionResult> GetPago(
+            [FromQuery] string? metodoPago)
         {
-            
-            var pago = await _contexto.Pagos
-                .Include(p => p.Reserva) 
-                .FirstOrDefaultAsync(p => p.IdPago == id);
-
-            if (pago == null) return NotFound("El pago no existe.");
-
-            return Ok(pago);
+            var query = _contexto.Pagos.AsQueryable();
+            if (!string.IsNullOrEmpty(metodoPago))
+            {
+                query = query.Where(p => p.MetodoPago.Contains(metodoPago));
+            }
+            var pagos = await query.Select(p => new FiltrarPagoOutput
+            {
+                IdPago = p.IdPago,
+                Monto = p.Monto,
+                MetodoPago = p.MetodoPago,
+                FechaPago = p.FechaPago
+            }).ToListAsync();
+            return Ok(pagos);
         }
 
         // Post
@@ -43,7 +54,7 @@ namespace ExploraTarija.Controllers
             var nuevoPago = new Pago
             {
                 Monto = usuarioInput.Monto,
-                MetodoPago = AdecuarTexto(usuarioInput.MetodoPago),
+                MetodoPago = NormalizarTexto(usuarioInput.MetodoPago),
                 FechaPago = DateTime.Now,
                 IdReserva = usuarioInput.IdReserva,
                 Estado = EstadoPago.Completado 
@@ -64,9 +75,9 @@ namespace ExploraTarija.Controllers
 
             return Ok(salida);
         }
-        private static string? AdecuarTexto(string? texto)
+        private static string NormalizarTexto(string texto)
         {
-            if (string.IsNullOrWhiteSpace(texto)) return null;
+            
             return texto.Trim().ToUpperInvariant();
         }
     }
